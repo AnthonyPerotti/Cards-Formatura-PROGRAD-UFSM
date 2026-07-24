@@ -6,7 +6,7 @@ import sys
 
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSplitter,
-    QPushButton, QLabel, QMessageBox, QFileDialog
+    QPushButton, QLabel, QMessageBox, QFileDialog, QSizePolicy
 )
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
@@ -44,7 +44,7 @@ class MainWindow(QMainWindow):
     def _setup_ui(self):
         self.setWindowTitle("Gerador de Cards — PROGRAD / UFSM")
         self.resize(1100, 720)
-        self.setMinimumSize(900, 600)
+        self.setMinimumSize(980, 620)
 
         # Ícone da janela (ISOLOGO)
         ico_path = resource_path(os.path.join("assets", "logo.ico"))
@@ -108,8 +108,9 @@ class MainWindow(QMainWindow):
             lbl_logo.setPixmap(pix)
             layout.addWidget(lbl_logo)
 
-        lbl_title = QLabel("Gerador de Cards — Colação de Grau  PROGRAD / UFSM")
+        lbl_title = QLabel("Gerador de Cards — Colação de Grau")
         lbl_title.setStyleSheet("color: #ffffff; font-size: 16px; font-weight: bold;")
+        lbl_title.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         layout.addWidget(lbl_title)
 
         layout.addStretch()
@@ -119,9 +120,10 @@ class MainWindow(QMainWindow):
         self._lbl_contagem.setStyleSheet(
             "background-color: rgba(255, 255, 255, 0.12); "
             "border: 1px solid rgba(255, 255, 255, 0.2); "
-            "border-radius: 6px; padding: 5px 14px; "
-            "color: #ffffff; font-size: 13px; font-weight: 500;"
+            "border-radius: 6px; padding: 4px 12px; "
+            "color: #ffffff; font-size: 12px; font-weight: 500;"
         )
+        self._lbl_contagem.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         layout.addWidget(self._lbl_contagem)
 
         return header
@@ -171,7 +173,7 @@ class MainWindow(QMainWindow):
         nm = len(self._dados.mesa)
         nh = len(self._dados.homenageados)
         self._lbl_contagem.setText(
-            f"🎓 {nf} formandos  |  🏛 {nm} mesa  |  ⭐ {nh} homenageados  |  Total: {total} cards"
+            f"🎓 {nf} formandos  •  🏛 {nm} mesa  •  ⭐ {nh} homenageados  •  Total: {total} cards"
         )
         if total > 0:
             self._lbl_status.setText(f"Pronto — {total} cards gerados.")

@@ -20,7 +20,7 @@ from core.card_data import (
 _STYLE_BTN_ACTION = (
     "QPushButton {"
     "  background-color: #1b365d; color: white; border: none;"
-    "  border-radius: 5px; padding: 5px 12px; font-size: 12px;"
+    "  border-radius: 5px; padding: 5px 10px; font-size: 12px;"
     "}"
     "QPushButton:hover { background-color: #2b4c7e; }"
     "QPushButton:pressed { background-color: #122540; }"
@@ -29,7 +29,7 @@ _STYLE_BTN_ACTION = (
 _STYLE_BTN_DANGER = (
     "QPushButton {"
     "  background-color: #c0392b; color: white; border: none;"
-    "  border-radius: 5px; padding: 5px 12px; font-size: 12px;"
+    "  border-radius: 5px; padding: 5px 10px; font-size: 12px;"
     "}"
     "QPushButton:hover { background-color: #e74c3c; }"
     "QPushButton:pressed { background-color: #96281b; }"
@@ -38,7 +38,7 @@ _STYLE_BTN_DANGER = (
 _STYLE_BTN_SECONDARY = (
     "QPushButton {"
     "  background-color: #5d6d7e; color: white; border: none;"
-    "  border-radius: 5px; padding: 5px 12px; font-size: 12px;"
+    "  border-radius: 5px; padding: 5px 10px; font-size: 12px;"
     "}"
     "QPushButton:hover { background-color: #717d8c; }"
 )
@@ -89,24 +89,30 @@ class AbaFormandos(QWidget):
         btns = QHBoxLayout()
         btns.setSpacing(6)
 
-        b_add = QPushButton("➕  Adicionar Formando")
+        b_add = QPushButton("➕  Adicionar")
+        b_add.setToolTip("Adicionar novo formando")
         b_add.setStyleSheet(_STYLE_BTN_ACTION)
+        b_add.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         b_add.clicked.connect(self._adicionar_linha)
         btns.addWidget(b_add)
 
-        b_del = QPushButton("🗑  Remover Selecionado")
+        b_del = QPushButton("🗑  Remover")
+        b_del.setToolTip("Remover formando selecionado")
         b_del.setStyleSheet(_STYLE_BTN_DANGER)
+        b_del.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         b_del.clicked.connect(self._remover_linha)
         btns.addWidget(b_del)
 
         btns.addStretch()
 
         b_imp = QPushButton("📂  Importar CSV")
+        b_imp.setToolTip("Importar lista de formandos via CSV")
         b_imp.setStyleSheet(_STYLE_BTN_SECONDARY)
         b_imp.clicked.connect(self._importar_csv)
         btns.addWidget(b_imp)
 
         b_exp = QPushButton("💾  Exportar CSV")
+        b_exp.setToolTip("Exportar lista de formandos para CSV")
         b_exp.setStyleSheet(_STYLE_BTN_SECONDARY)
         b_exp.clicked.connect(self._exportar_csv)
         btns.addWidget(b_exp)
@@ -211,24 +217,30 @@ class AbaMesa(QWidget):
         btns = QHBoxLayout()
         btns.setSpacing(6)
 
-        b_add = QPushButton("➕  Adicionar Membro")
+        b_add = QPushButton("➕  Adicionar")
+        b_add.setToolTip("Adicionar novo membro da mesa")
         b_add.setStyleSheet(_STYLE_BTN_ACTION)
+        b_add.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         b_add.clicked.connect(self._adicionar_linha)
         btns.addWidget(b_add)
 
-        b_del = QPushButton("🗑  Remover Selecionado")
+        b_del = QPushButton("🗑  Remover")
+        b_del.setToolTip("Remover membro selecionado")
         b_del.setStyleSheet(_STYLE_BTN_DANGER)
+        b_del.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         b_del.clicked.connect(self._remover_linha)
         btns.addWidget(b_del)
 
         btns.addStretch()
 
         b_imp = QPushButton("📂  Importar CSV")
+        b_imp.setToolTip("Importar membros da mesa via CSV")
         b_imp.setStyleSheet(_STYLE_BTN_SECONDARY)
         b_imp.clicked.connect(self._importar_csv)
         btns.addWidget(b_imp)
 
         b_exp = QPushButton("💾  Exportar CSV")
+        b_exp.setToolTip("Exportar lista da mesa para CSV")
         b_exp.setStyleSheet(_STYLE_BTN_SECONDARY)
         b_exp.clicked.connect(self._exportar_csv)
         btns.addWidget(b_exp)
@@ -333,24 +345,30 @@ class AbaHomenageados(QWidget):
         btns = QHBoxLayout()
         btns.setSpacing(6)
 
-        b_add = QPushButton("➕  Adicionar Homenageado")
+        b_add = QPushButton("➕  Adicionar")
+        b_add.setToolTip("Adicionar novo homenageado")
         b_add.setStyleSheet(_STYLE_BTN_ACTION)
+        b_add.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         b_add.clicked.connect(self._adicionar_linha)
         btns.addWidget(b_add)
 
-        b_del = QPushButton("🗑  Remover Selecionado")
+        b_del = QPushButton("🗑  Remover")
+        b_del.setToolTip("Remover homenageado selecionado")
         b_del.setStyleSheet(_STYLE_BTN_DANGER)
+        b_del.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         b_del.clicked.connect(self._remover_linha)
         btns.addWidget(b_del)
 
         btns.addStretch()
 
         b_imp = QPushButton("📂  Importar CSV")
+        b_imp.setToolTip("Importar homenageados via CSV")
         b_imp.setStyleSheet(_STYLE_BTN_SECONDARY)
         b_imp.clicked.connect(self._importar_csv)
         btns.addWidget(b_imp)
 
         b_exp = QPushButton("💾  Exportar CSV")
+        b_exp.setToolTip("Exportar lista de homenageados para CSV")
         b_exp.setStyleSheet(_STYLE_BTN_SECONDARY)
         b_exp.clicked.connect(self._exportar_csv)
         btns.addWidget(b_exp)
@@ -502,7 +520,7 @@ class DataPanelWidget(QWidget):
         self._tabs.setUsesScrollButtons(False)          # sem seta de scroll — expande
         self._tabs.setStyleSheet(
             "QTabWidget::pane { border: 1px solid #cccccc; border-radius: 4px; }"
-            "QTabBar::tab { padding: 8px 20px; font-size: 13px; font-weight: bold; min-width: 120px; }"
+            "QTabBar::tab { padding: 8px 16px 10px 16px; font-size: 13px; font-weight: bold; min-width: 110px; min-height: 20px; }"
             "QTabBar::tab:selected { background: #1b365d; color: white; border-radius: 4px 4px 0 0; }"
             "QTabBar::tab:!selected { background: #e8e8e8; color: #555555; }"
         )
