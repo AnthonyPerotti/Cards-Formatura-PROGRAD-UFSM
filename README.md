@@ -102,6 +102,20 @@ Para resolver isso de forma transparente, a aplicação possui uma rotina de aut
 
 Caso o operador precise liberar manualmente antes de abrir a primeira vez, basta clicar com o botão direito sobre o arquivo `.exe`, acessar **Propriedades**, marcar a caixa **Desbloquear** na aba Geral e clicar em **OK**.
 
+## Licença
+
+Este projeto está licenciado sob a licença **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**.
+
+Você é livre para:
+- **Compartilhar:** Copiar e redistribuir o material em qualquer suporte ou formato.
+- **Adaptar:** Remixar, transformar e criar a partir do material para qualquer fim não comercial.
+
+Sob os seguintes termos:
+- **Atribuição:** Deve dar o crédito apropriado ao autor original.
+- **Não Comercial:** Você não pode usar o material para fins comerciais.
+
+Para mais detalhes, consulte o arquivo [LICENSE](LICENSE).
+
 ---
 
 ## Autoria e Créditos
