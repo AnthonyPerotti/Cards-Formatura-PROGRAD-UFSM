@@ -78,9 +78,9 @@ class MainWindow(QMainWindow):
         self._preview = CardPreviewWidget(self._dados)
         splitter.addWidget(self._preview)
 
-        splitter.setSizes([520, 560])
-        splitter.setStretchFactor(0, 4)
-        splitter.setStretchFactor(1, 5)
+        splitter.setSizes([650, 450])
+        splitter.setStretchFactor(0, 6)
+        splitter.setStretchFactor(1, 4)
         root.addWidget(splitter, 1)
 
         # ── Rodapé / barra de ação ─────────────────────────────────────────────

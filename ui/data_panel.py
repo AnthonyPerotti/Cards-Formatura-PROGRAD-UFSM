@@ -5,16 +5,47 @@ import os
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTabWidget, QTableWidget,
     QTableWidgetItem, QPushButton, QLabel, QFileDialog, QAbstractItemView,
-    QHeaderView, QMessageBox, QSizePolicy
+    QHeaderView, QMessageBox, QSizePolicy, QStyledItemDelegate,
+    QStyleOptionViewItem, QStyle, QApplication
 )
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont, QColor
 
 from core.card_data import (
     DadosCerimonia, Formando, MembroMesa, Homenageado,
+    parse_arquivo_formandos, parse_arquivo_mesa, parse_arquivo_homenageados,
     parse_csv_formandos, parse_csv_mesa, parse_csv_homenageados,
     export_csv_formandos, export_csv_mesa, export_csv_homenageados,
 )
+
+
+class NoElideDelegate(QStyledItemDelegate):
+    def paint(self, painter, option, index):
+        opt = QStyleOptionViewItem(option)
+        self.initStyleOption(opt, index)
+        opt.textElideMode = Qt.ElideNone
+
+        painter.save()
+        widget = opt.widget
+        style = widget.style() if widget else QApplication.style()
+
+        # Desenha fundo e selecao
+        style.drawPrimitive(QStyle.PE_PanelItemViewRow, opt, painter, widget)
+        style.drawPrimitive(QStyle.PE_PanelItemViewItem, opt, painter, widget)
+
+        # Desenha texto completo sem insolar reticencias
+        text = index.data(Qt.DisplayRole)
+        if text:
+            rect = opt.rect.adjusted(6, 0, -6, 0)
+            if opt.state & QStyle.State_Selected:
+                color = opt.palette.highlightedText().color()
+            else:
+                color = opt.palette.text().color()
+            painter.setPen(color)
+            painter.setFont(opt.font)
+            painter.drawText(rect, Qt.AlignLeft | Qt.AlignVCenter | Qt.TextSingleLine, str(text))
+
+        painter.restore()
 
 
 _STYLE_BTN_ACTION = (
@@ -47,9 +78,11 @@ _STYLE_BTN_SECONDARY = (
 def _make_table(headers: list[str]) -> QTableWidget:
     t = QTableWidget(0, len(headers))
     t.setHorizontalHeaderLabels(headers)
-    t.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-    if len(headers) > 1:
-        t.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+    t.setTextElideMode(Qt.ElideNone)
+    t.setItemDelegate(NoElideDelegate(t))
+    for i in range(len(headers)):
+        t.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
+    t.horizontalHeader().setStretchLastSection(True)
     t.verticalHeader().setVisible(True)
     t.setSelectionBehavior(QAbstractItemView.SelectRows)
     t.setAlternatingRowColors(True)
@@ -105,14 +138,14 @@ class AbaFormandos(QWidget):
 
         btns.addStretch()
 
-        b_imp = QPushButton("📂  Importar CSV")
-        b_imp.setToolTip("Importar lista de formandos via CSV")
+        b_imp = QPushButton("📂  Importar Planilha")
+        b_imp.setToolTip("Importar lista de formandos via Excel (.xlsx) ou CSV")
         b_imp.setStyleSheet(_STYLE_BTN_SECONDARY)
         b_imp.clicked.connect(self._importar_csv)
         btns.addWidget(b_imp)
 
-        b_exp = QPushButton("💾  Exportar CSV")
-        b_exp.setToolTip("Exportar lista de formandos para CSV")
+        b_exp = QPushButton("💾  Exportar Tabela")
+        b_exp.setToolTip("Exportar lista de formandos para arquivo CSV")
         b_exp.setStyleSheet(_STYLE_BTN_SECONDARY)
         b_exp.clicked.connect(self._exportar_csv)
         btns.addWidget(b_exp)
@@ -160,14 +193,12 @@ class AbaFormandos(QWidget):
 
     def _importar_csv(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Importar CSV de Formandos", "", "CSV (*.csv);;Todos os arquivos (*)"
+            self, "Importar Planilha de Formandos", "", "Planilhas Excel e CSV (*.xlsx *.xls *.csv);;Todos os arquivos (*)"
         )
         if not path:
             return
         try:
-            with open(path, encoding="utf-8-sig") as f:
-                content = f.read()
-            self._dados.formandos = parse_csv_formandos(content)
+            self._dados.formandos = parse_arquivo_formandos(path)
             self._carregar_dados()
             self.dados_alterados.emit()
         except Exception as e:
@@ -233,14 +264,14 @@ class AbaMesa(QWidget):
 
         btns.addStretch()
 
-        b_imp = QPushButton("📂  Importar CSV")
-        b_imp.setToolTip("Importar membros da mesa via CSV")
+        b_imp = QPushButton("📂  Importar Planilha")
+        b_imp.setToolTip("Importar membros da mesa via Excel (.xlsx) ou CSV")
         b_imp.setStyleSheet(_STYLE_BTN_SECONDARY)
         b_imp.clicked.connect(self._importar_csv)
         btns.addWidget(b_imp)
 
-        b_exp = QPushButton("💾  Exportar CSV")
-        b_exp.setToolTip("Exportar lista da mesa para CSV")
+        b_exp = QPushButton("💾  Exportar Tabela")
+        b_exp.setToolTip("Exportar lista da mesa para arquivo CSV")
         b_exp.setStyleSheet(_STYLE_BTN_SECONDARY)
         b_exp.clicked.connect(self._exportar_csv)
         btns.addWidget(b_exp)
@@ -288,14 +319,12 @@ class AbaMesa(QWidget):
 
     def _importar_csv(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Importar CSV da Mesa", "", "CSV (*.csv);;Todos os arquivos (*)"
+            self, "Importar Planilha da Mesa", "", "Planilhas Excel e CSV (*.xlsx *.xls *.csv);;Todos os arquivos (*)"
         )
         if not path:
             return
         try:
-            with open(path, encoding="utf-8-sig") as f:
-                content = f.read()
-            self._dados.mesa = parse_csv_mesa(content)
+            self._dados.mesa = parse_arquivo_mesa(path)
             self._carregar_dados()
             self.dados_alterados.emit()
         except Exception as e:
@@ -361,14 +390,14 @@ class AbaHomenageados(QWidget):
 
         btns.addStretch()
 
-        b_imp = QPushButton("📂  Importar CSV")
-        b_imp.setToolTip("Importar homenageados via CSV")
+        b_imp = QPushButton("📂  Importar Planilha")
+        b_imp.setToolTip("Importar homenageados via Excel (.xlsx) ou CSV")
         b_imp.setStyleSheet(_STYLE_BTN_SECONDARY)
         b_imp.clicked.connect(self._importar_csv)
         btns.addWidget(b_imp)
 
-        b_exp = QPushButton("💾  Exportar CSV")
-        b_exp.setToolTip("Exportar lista de homenageados para CSV")
+        b_exp = QPushButton("💾  Exportar Tabela")
+        b_exp.setToolTip("Exportar lista de homenageados para arquivo CSV")
         b_exp.setStyleSheet(_STYLE_BTN_SECONDARY)
         b_exp.clicked.connect(self._exportar_csv)
         btns.addWidget(b_exp)
@@ -416,14 +445,12 @@ class AbaHomenageados(QWidget):
 
     def _importar_csv(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Importar CSV de Homenageados", "", "CSV (*.csv);;Todos os arquivos (*)"
+            self, "Importar Planilha de Homenageados", "", "Planilhas Excel e CSV (*.xlsx *.xls *.csv);;Todos os arquivos (*)"
         )
         if not path:
             return
         try:
-            with open(path, encoding="utf-8-sig") as f:
-                content = f.read()
-            self._dados.homenageados = parse_csv_homenageados(content)
+            self._dados.homenageados = parse_arquivo_homenageados(path)
             self._carregar_dados()
             self.dados_alterados.emit()
         except Exception as e:
@@ -518,9 +545,10 @@ class DataPanelWidget(QWidget):
         self._tabs = QTabWidget()
         self._tabs.setElideMode(Qt.ElideNone)          # nunca cortar texto das abas
         self._tabs.setUsesScrollButtons(False)          # sem seta de scroll — expande
+        self._tabs.tabBar().setElideMode(Qt.ElideNone)
         self._tabs.setStyleSheet(
             "QTabWidget::pane { border: 1px solid #cccccc; border-radius: 4px; }"
-            "QTabBar::tab { padding: 8px 16px 10px 16px; font-size: 13px; font-weight: bold; min-width: 110px; min-height: 20px; }"
+            "QTabBar::tab { padding: 8px 20px; font-size: 13px; font-weight: bold; min-width: 140px; min-height: 24px; margin-right: 4px; }"
             "QTabBar::tab:selected { background: #1b365d; color: white; border-radius: 4px 4px 0 0; }"
             "QTabBar::tab:!selected { background: #e8e8e8; color: #555555; }"
         )

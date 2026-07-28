@@ -14,15 +14,13 @@ if errorlevel 1 (
     pip install pyinstaller
 )
 
-echo [1/2] Compilando executavel autossuficiente (.exe)...
-pyinstaller --onefile --windowed --icon=assets\logo.ico --name="Gerador de Cards PROGRAD" --add-data "assets;assets" -y main.py
+echo [1/2] Compilando executavel autossuficiente (.exe) em modo otimizado...
+pyinstaller --noconfirm "Gerador de Cards PROGRAD.spec"
 
 if errorlevel 1 (
     echo.
-    echo [ERRO] A compilacao falhou. Verifique as mensagens acima.
-    echo.
-    pause
-    exit /b 1
+    echo [INFO] Tentando compilacao alternativa...
+    pyinstaller --onefile --windowed --noupx --icon=assets\logo.ico --name="Gerador de Cards PROGRAD" --add-data "assets;assets" --exclude-module tkinter --exclude-module unittest -y main.py
 )
 
 echo.

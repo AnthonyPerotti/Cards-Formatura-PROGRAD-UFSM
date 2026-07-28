@@ -153,8 +153,12 @@ class CardRenderer(QWidget):
         painter.setPen(QColor("black"))
 
         if tipo == "formando":
+            num_size = max(8, int(26 * scale))
+            f_num = QFont(_FONT_FAMILY, num_size)
+            f_num.setBold(True)
+            painter.setFont(f_num)
             painter.drawText(
-                QRect(card_x, card_y + int(0.04 * card_h), card_w, int(0.18 * card_h)),
+                QRect(card_x, card_y + int(0.03 * card_h), card_w, int(0.10 * card_h)),
                 Qt.AlignHCenter | Qt.AlignVCenter, numero_str
             )
         else:
@@ -162,28 +166,47 @@ class CardRenderer(QWidget):
             f_num2 = QFont(_FONT_FAMILY, num_size_h)
             painter.setFont(f_num2)
             painter.drawText(
-                QRect(card_x, card_y + int(0.04 * card_h), card_w - int(0.04 * card_w), int(0.12 * card_h)),
+                QRect(card_x, card_y + int(0.03 * card_h), card_w - int(0.04 * card_w), int(0.10 * card_h)),
                 Qt.AlignRight | Qt.AlignVCenter, numero_str
             )
 
-        # --- Nome (grande, centralizado) ---
-        nome_size = max(10, int(38 * scale))
+        # --- Nome (grande, imponente e centralizado com escala idêntica ao PDF) ---
+        words_nome = len(nome.split())
+        if len(nome) > 28 or words_nome > 4:
+            raw_size = 33
+            nome_line_factor = 1.14
+        else:
+            raw_size = 38
+            nome_line_factor = 1.15
+
+        nome_size = max(9, int(raw_size * scale))
         f_nome = QFont(_FONT_FAMILY, nome_size)
         f_nome.setBold(True)
         painter.setFont(f_nome)
         painter.setPen(QColor("black"))
 
-        nome_rect_w = int(0.875 * card_w)
-        nome_center_y = card_y + int(0.40 * card_h) if tipo == "formando" else card_y + int(0.35 * card_h)
-        _draw_centered_wrapped_text(painter, nome, center_x, nome_center_y, nome_rect_w, f_nome)
+        nome_rect_w = int(0.93 * card_w)
+        nome_center_y = card_y + int(0.40 * card_h) if tipo == "formando" else card_y + int(0.36 * card_h)
+        _draw_centered_wrapped_text(
+            painter, nome, center_x, nome_center_y, nome_rect_w, f_nome,
+            font_pt_size=raw_size, scale=scale, line_height_factor=nome_line_factor
+        )
 
-        # --- Subtítulo ---
-        sub_size = max(7, int(22 * scale))
+        # --- Subtítulo (Curso / Cargo / Título com formatação específica de cursos) ---
+        from core.card_data import formatar_nome_curso
+        subtitulo_fmt = formatar_nome_curso(subtitulo)
+
+        raw_sub_size = 24
+        sub_line_factor = 1.18
+        sub_size = max(7, int(raw_sub_size * scale))
         f_sub = QFont(_FONT_FAMILY, sub_size)
         f_sub.setBold(False)
         painter.setFont(f_sub)
-        sub_center_y = card_y + int(0.70 * card_h)
-        _draw_centered_wrapped_text(painter, subtitulo, center_x, sub_center_y, nome_rect_w, f_sub)
+        sub_center_y = card_y + int(0.73 * card_h)
+        _draw_centered_wrapped_text(
+            painter, subtitulo_fmt, center_x, sub_center_y, nome_rect_w, f_sub,
+            font_pt_size=raw_sub_size, scale=scale, line_height_factor=sub_line_factor
+        )
 
         # --- Rodapé Esquerdo: Logo UFSM + Linha + LOGOTIPO ---
         logo_h = int(0.135 * card_h)
@@ -228,34 +251,42 @@ def _draw_centered_wrapped_text(
     center_y: int,
     max_width: int,
     font: QFont,
+    font_pt_size: int,
+    scale: float,
+    line_height_factor: float = 1.15,
 ):
-    """Desenha texto centralizado com wrap automático de linha."""
+    """Desenha texto centralizado com suporte a quebras manuais (\\n) e wrap automático."""
     if not text:
         return
 
     fm = QFontMetrics(font)
-    words = text.split()
     lines = []
-    current = ""
-    for word in words:
-        test = (current + " " + word).strip()
-        if fm.horizontalAdvance(test) <= max_width:
-            current = test
-        else:
-            if current:
-                lines.append(current)
-            current = word
-    if current:
-        lines.append(current)
+    if "\n" in text:
+        lines = [l.strip() for l in text.split("\n") if l.strip()]
+    else:
+        words = text.split()
+        current = ""
+        for word in words:
+            test = (current + " " + word).strip()
+            if fm.horizontalAdvance(test) <= max_width:
+                current = test
+            else:
+                if current:
+                    lines.append(current)
+                current = word
+        if current:
+            lines.append(current)
 
-    line_h = fm.height()
-    total_h = len(lines) * line_h
-    start_y = center_y - total_h // 2 + fm.ascent()
+    line_h = int(font_pt_size * scale * line_height_factor)
+    total_h = (len(lines) - 1) * line_h
+    start_y = center_y - total_h // 2
 
     for i, line in enumerate(lines):
         line_w = fm.horizontalAdvance(line)
         x = center_x - line_w // 2
-        painter.drawText(x, start_y + i * line_h, line)
+        y_linha = start_y + i * line_h
+        y_baseline = y_linha + fm.ascent() // 3
+        painter.drawText(x, y_baseline, line)
 
 
 class CardPreviewWidget(QWidget):

@@ -13,7 +13,7 @@ from reportlab.pdfgen import canvas as rl_canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-from core.card_data import DadosCerimonia
+from core.card_data import DadosCerimonia, formatar_nome_curso
 
 
 def resource_path(relative: str) -> str:
@@ -121,26 +121,38 @@ def _desenhar_card(c: rl_canvas.Canvas, card: dict, logo_path: str, logotipo_pat
     # --- Número ---
     c.setFillColorRGB(0, 0, 0)
     if tipo == "formando":
-        c.setFont(_font_bold(), 25)
-        c.drawCentredString(center_x, cy + CARD_H - 1.2 * cm, numero_str)
+        c.setFont(_font_bold(), 26)
+        c.drawCentredString(center_x, cy + CARD_H - 1.0 * cm, numero_str)
     else:
         tamanho = 20 if tipo == "homenageado" else 16
         c.setFont(_font_regular(), tamanho)
         c.drawRightString(cx + CARD_W - 0.5 * cm, cy + CARD_H - 0.8 * cm, numero_str)
 
-    # --- Nome (grande, centralizado) ---
-    nome_y_frac = 0.60 if tipo == "formando" else 0.65
+    # --- Nome (grande, imponente e centralizado) ---
+    words_nome = len(nome.split())
+    if len(nome) > 28 or words_nome > 4:
+        nome_font_size = 33
+        nome_line_h = 33 * 1.14
+    else:
+        nome_font_size = 38
+        nome_line_h = 38 * 1.15
+
+    nome_y_frac = 0.60 if tipo == "formando" else 0.64
     nome_y = cy + CARD_H * nome_y_frac
     _draw_text_centered_wrapped(
-        c, nome, center_x, nome_y, 14 * cm, 40, _font_bold(),
-        line_height=40 * 1.15
+        c, nome, center_x, nome_y, 15.2 * cm, nome_font_size, _font_bold(),
+        line_height=nome_line_h
     )
 
-    # --- Subtítulo (curso / cargo / título) ---
-    sub_y = cy + CARD_H * 0.28
+    # --- Subtítulo (curso / cargo / título com formatação específica de cursos) ---
+    subtitulo_fmt = formatar_nome_curso(subtitulo)
+
+    sub_font_size = 24
+    sub_line_h = 24 * 1.18
+    sub_y = cy + CARD_H * 0.27
     _draw_text_centered_wrapped(
-        c, subtitulo, center_x, sub_y, 14 * cm, 25, _font_regular(),
-        line_height=25 * 1.25
+        c, subtitulo_fmt, center_x, sub_y, 15.8 * cm, sub_font_size, _font_regular(),
+        line_height=sub_line_h
     )
 
     # --- Rodapé Esquerdo: Logo UFSM + Linha + LOGOTIPO ---
@@ -192,27 +204,29 @@ def _draw_text_centered_wrapped(
     font_name: str,
     line_height: float,
 ):
-    """Desenha texto centralizado com quebra de linha automática."""
+    """Desenha texto centralizado com suporte a quebras manuais (\\n) e wrap automático."""
     if not text:
         return
 
     c.setFont(font_name, font_size)
 
-    words = text.split()
     lines = []
-    current = ""
-    for word in words:
-        test = (current + " " + word).strip()
-        if c.stringWidth(test, font_name, font_size) <= max_width:
-            current = test
-        else:
-            if current:
-                lines.append(current)
-            current = word
-    if current:
-        lines.append(current)
+    if "\n" in text:
+        lines = [l.strip() for l in text.split("\n") if l.strip()]
+    else:
+        words = text.split()
+        current = ""
+        for word in words:
+            test = (current + " " + word).strip()
+            if c.stringWidth(test, font_name, font_size) <= max_width:
+                current = test
+            else:
+                if current:
+                    lines.append(current)
+                current = word
+        if current:
+            lines.append(current)
 
-    # Centralizar verticalmente o bloco
     total_h = (len(lines) - 1) * line_height
     start_y = y + total_h / 2
 

@@ -1,4 +1,5 @@
-﻿PyQt5==5.15.11
+PyQt5==5.15.11
 reportlab==5.0.0
 pillow>=10.0.0
 pyinstaller>=6.0.0
+openpyxl>=3.0.0
