@@ -118,7 +118,7 @@ def _desenhar_card(c: rl_canvas.Canvas, card: dict, logo_path: str, logotipo_pat
 
     center_x = cx + CARD_W / 2
 
-    # --- Número ---
+    # Número
     c.setFillColorRGB(0, 0, 0)
     if tipo == "formando":
         c.setFont(_font_bold(), 26)
@@ -128,7 +128,7 @@ def _desenhar_card(c: rl_canvas.Canvas, card: dict, logo_path: str, logotipo_pat
         c.setFont(_font_regular(), tamanho)
         c.drawRightString(cx + CARD_W - 0.5 * cm, cy + CARD_H - 0.8 * cm, numero_str)
 
-    # --- Nome (grande, imponente e centralizado) ---
+    # Nome
     words_nome = len(nome.split())
     if len(nome) > 28 or words_nome > 4:
         nome_font_size = 33
@@ -144,7 +144,7 @@ def _desenhar_card(c: rl_canvas.Canvas, card: dict, logo_path: str, logotipo_pat
         line_height=nome_line_h
     )
 
-    # --- Subtítulo (curso / cargo / título com formatação específica de cursos) ---
+    # Subtítulo (curso, cargo ou título)
     subtitulo_fmt = formatar_nome_curso(subtitulo)
 
     sub_font_size = 24
@@ -155,12 +155,11 @@ def _desenhar_card(c: rl_canvas.Canvas, card: dict, logo_path: str, logotipo_pat
         line_height=sub_line_h
     )
 
-    # --- Rodapé Esquerdo: Logo UFSM + Linha + LOGOTIPO ---
+    # Rodapé esquerdo (logos)
     logo_h = 1.25 * cm
     logo_y = cy + 0.45 * cm
     curr_x = cx + 0.45 * cm
 
-    # 1. Logo principal UFSM PROGRAD
     if os.path.exists(logo_path):
         try:
             from PIL import Image as PILImage
@@ -172,13 +171,11 @@ def _desenhar_card(c: rl_canvas.Canvas, card: dict, logo_path: str, logotipo_pat
         except Exception:
             pass
 
-    # 2. Linha vertical separadora (tom marrom #c48444)
     c.setLineWidth(1)
     c.setStrokeColorRGB(0.77, 0.52, 0.27)
     c.line(curr_x, logo_y, curr_x, logo_y + logo_h)
     curr_x += 0.25 * cm
 
-    # 3. LOGOTIPO.png ao lado da linha
     if os.path.exists(logotipo_path):
         try:
             from PIL import Image as PILImage
@@ -188,7 +185,7 @@ def _desenhar_card(c: rl_canvas.Canvas, card: dict, logo_path: str, logotipo_pat
         except Exception:
             pass
 
-    # --- Rodapé direito ---
+    # Rodapé direito
     c.setFillColorRGB(0, 0, 0)
     c.setFont(_font_regular(), 16)
     c.drawRightString(cx + CARD_W - 0.5 * cm, cy + 0.8 * cm, rodape)

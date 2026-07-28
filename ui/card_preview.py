@@ -145,7 +145,7 @@ class CardRenderer(QWidget):
         # Escala de fonte
         scale = card_w / 453.0
 
-        # --- Número ---
+        # Número
         num_size = max(8, int(25 * scale))
         f_num = QFont(_FONT_FAMILY, num_size)
         f_num.setBold(True)
@@ -170,7 +170,7 @@ class CardRenderer(QWidget):
                 Qt.AlignRight | Qt.AlignVCenter, numero_str
             )
 
-        # --- Nome (grande, imponente e centralizado com escala idêntica ao PDF) ---
+        # Nome
         words_nome = len(nome.split())
         if len(nome) > 28 or words_nome > 4:
             raw_size = 33
@@ -192,7 +192,7 @@ class CardRenderer(QWidget):
             font_pt_size=raw_size, scale=scale, line_height_factor=nome_line_factor
         )
 
-        # --- Subtítulo (Curso / Cargo / Título com formatação específica de cursos) ---
+        # Subtítulo (curso, cargo ou título)
         from core.card_data import formatar_nome_curso
         subtitulo_fmt = formatar_nome_curso(subtitulo)
 
@@ -208,30 +208,27 @@ class CardRenderer(QWidget):
             font_pt_size=raw_sub_size, scale=scale, line_height_factor=sub_line_factor
         )
 
-        # --- Rodapé Esquerdo: Logo UFSM + Linha + LOGOTIPO ---
+        # Rodapé esquerdo (logos)
         logo_h = int(0.135 * card_h)
         logo_y = card_y + card_h - logo_h - int(0.045 * card_h)
         curr_x = card_x + int(0.03 * card_w)
 
-        # 1. Logo UFSM PROGRAD
         if self._logo_pixmap and not self._logo_pixmap.isNull():
             logo_pix = self._logo_pixmap.scaledToHeight(logo_h, Qt.SmoothTransformation)
             painter.drawPixmap(curr_x, logo_y, logo_pix)
             curr_x += logo_pix.width() + int(0.02 * card_w)
 
-        # 2. Linha vertical separadora (tom marrom/dourado #c48444)
         line_pen = QPen(QColor("#c48444"))
         line_pen.setWidth(max(1, card_w // 350))
         painter.setPen(line_pen)
         painter.drawLine(curr_x, logo_y, curr_x, logo_y + logo_h)
         curr_x += int(0.02 * card_w)
 
-        # 3. LOGOTIPO.png
         if self._logotipo_pixmap and not self._logotipo_pixmap.isNull():
             logotipo_pix = self._logotipo_pixmap.scaledToHeight(logo_h, Qt.SmoothTransformation)
             painter.drawPixmap(curr_x, logo_y, logotipo_pix)
 
-        # --- Texto do evento (canto inferior direito) ---
+        # Rodapé direito
         rodape_size = max(6, int(14 * scale))
         f_rodape = QFont(_FONT_FAMILY, rodape_size)
         painter.setFont(f_rodape)

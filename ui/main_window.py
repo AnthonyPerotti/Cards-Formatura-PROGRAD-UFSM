@@ -57,11 +57,9 @@ class MainWindow(QMainWindow):
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
 
-        # ── Cabeçalho ──────────────────────────────────────────────────────────
         header = self._criar_header()
         root.addWidget(header)
 
-        # ── Corpo (splitter) ───────────────────────────────────────────────────
         splitter = QSplitter(Qt.Horizontal)
         splitter.setHandleWidth(6)
         splitter.setStyleSheet(
@@ -69,12 +67,10 @@ class MainWindow(QMainWindow):
             "QSplitter::handle:hover { background-color: #1b365d; }"
         )
 
-        # Painel esquerdo — dados
         self._data_panel = DataPanelWidget(self._dados)
         self._data_panel.dados_alterados.connect(self._on_dados_alterados)
         splitter.addWidget(self._data_panel)
 
-        # Painel direito — preview
         self._preview = CardPreviewWidget(self._dados)
         splitter.addWidget(self._preview)
 
@@ -83,7 +79,6 @@ class MainWindow(QMainWindow):
         splitter.setStretchFactor(1, 4)
         root.addWidget(splitter, 1)
 
-        # ── Rodapé / barra de ação ─────────────────────────────────────────────
         footer = self._criar_footer()
         root.addWidget(footer)
 
